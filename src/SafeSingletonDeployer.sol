@@ -6,6 +6,7 @@ import {Vm} from "forge-std/Vm.sol";
 /// @notice Library for deploying contracts using Safe's Singleton Factory
 ///         https://github.com/safe-global/safe-singleton-factory
 library SafeSingletonDeployer {
+    error MissingSafeSingletonFactory();
     error DeployFailed();
 
     address constant SAFE_SINGLETON_FACTORY = 0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7;
@@ -80,6 +81,10 @@ library SafeSingletonDeployer {
     function _deploy(bytes memory creationCode, bytes memory args, bytes32 salt) private returns (address) {
         // ensure Safe Singleton Factory exists if we're deploying to anvil
         prepareAnvil();
+
+        if (SAFE_SINGLETON_FACTORY.code.length == 0) {
+            revert MissingSafeSingletonFactory();
+        }
 
         bytes memory callData = abi.encodePacked(salt, creationCode, args);
 

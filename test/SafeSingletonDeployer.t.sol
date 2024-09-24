@@ -43,4 +43,14 @@ contract SafeSingletonDeployerTest is Test {
             salt: bytes32("0x1234")
         });
     }
+
+    function test_deploy_missingFactory() public {
+        vm.chainId(1);
+        vm.expectRevert(SafeSingletonDeployer.MissingSafeSingletonFactory.selector);
+        SafeSingletonDeployer.deploy({
+            creationCode: type(Mock).creationCode,
+            args: abi.encode(1),
+            salt: bytes32("0x1234")
+        });
+    }
 }
