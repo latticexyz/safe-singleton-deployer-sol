@@ -44,7 +44,7 @@ contract SafeSingletonDeployerTest is Test {
         });
     }
 
-    function test_deploy_missingFactory() public {
+    function test_deploy_chainWithoutFactory() public {
         vm.chainId(1);
         vm.expectRevert(SafeSingletonDeployer.MissingSafeSingletonFactory.selector);
         SafeSingletonDeployer.deploy({
