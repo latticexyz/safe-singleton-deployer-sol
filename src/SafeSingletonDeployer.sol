@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Vm} from "forge-std/Vm.sol";
+import {VmSafe, Vm} from "forge-std/Vm.sol";
 
 /// @notice Library for deploying contracts using Safe's Singleton Factory
 ///         https://github.com/safe-global/safe-singleton-factory
@@ -15,7 +15,7 @@ library SafeSingletonDeployer {
     bytes constant factoryCode =
         hex"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3";
 
-    Vm private constant VM = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+    VmSafe private constant VM = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
 
     function computeAddress(bytes memory creationCode, bytes32 salt) public pure returns (address) {
         return computeAddress(creationCode, "", salt);
@@ -105,7 +105,7 @@ library SafeSingletonDeployer {
 
     function prepareAnvil() public {
         if (block.chainid == 31337) {
-            VM.etch(SafeSingletonDeployer.SAFE_SINGLETON_FACTORY, factoryCode);
+            Vm(address(VM)).etch(SafeSingletonDeployer.SAFE_SINGLETON_FACTORY, factoryCode);
         }
     }
 }
