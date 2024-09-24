@@ -9,6 +9,11 @@ library SafeSingletonDeployer {
     error DeployFailed();
 
     address constant SAFE_SINGLETON_FACTORY = 0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7;
+
+    // cast code 0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7 --rpc-url https://mainnet.base.org
+    bytes constant factoryCode =
+        hex"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3";
+
     VmSafe private constant VM = VmSafe(address(uint160(uint256(keccak256("hevm cheat code")))));
 
     function computeAddress(bytes memory creationCode, bytes32 salt) public pure returns (address) {
@@ -73,6 +78,9 @@ library SafeSingletonDeployer {
     }
 
     function _deploy(bytes memory creationCode, bytes memory args, bytes32 salt) private returns (address) {
+        // ensure Safe Singleton Factory exists if we're deploying to anvil
+        prepareAnvil();
+
         bytes memory callData = abi.encodePacked(salt, creationCode, args);
 
         (bool success, bytes memory result) = SAFE_SINGLETON_FACTORY.call(callData);
@@ -88,5 +96,11 @@ library SafeSingletonDeployer {
 
     function _hashInitCode(bytes memory creationCode, bytes memory args) private pure returns (bytes32) {
         return keccak256(abi.encodePacked(creationCode, args));
+    }
+
+    function prepareAnvil() {
+        if (block.chainid == 31337) {
+            vm.etch(SafeSingletonDeployer.SAFE_SINGLETON_FACTORY, factoryCode);
+        }
     }
 }
